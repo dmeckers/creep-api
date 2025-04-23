@@ -16,15 +16,27 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
+    public const TELEGRAM_ID       = 'telegram_id';
+    public const TELEGRAM_USERNAME = 'telegram_username';
+    public const PHOTO_URL         = 'photo_url';
+    public const LAST_NAME         = 'last_name';
+    public const NAME              = 'name';
+    public const EMAIL             = 'email';
+    public const PASSWORD          = 'password';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        self::NAME,
+        self::EMAIL,
+        self::PASSWORD,
+        self::TELEGRAM_ID,
+        self::TELEGRAM_USERNAME,
+        self::PHOTO_URL,
+        self::LAST_NAME,
     ];
 
     /**

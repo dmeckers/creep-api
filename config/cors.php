@@ -15,20 +15,23 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['*'], // Allow all paths
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => ['*'],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '^https:\/\/[a-z0-9\-]+\.ngrok\-free\.app$',
+        '^https:\/\/[a-z0-9\-]+\.a\.free\.pinggy\.link$',
+    ],
 
     'allowed_headers' => ['*'],
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['*'], // Expose all headers
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true, // Enable credentials support
 
 ];

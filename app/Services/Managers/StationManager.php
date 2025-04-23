@@ -49,13 +49,13 @@ class StationManager
                 config('liquidsoap.docker.memory-limit'),
                 config('liquidsoap.docker.image'),
                 // 'pltnk/liquidsoap:latest',
-                // self::LIQUIDSOAP_CONTAINER_CONFIG_PATH
-                'tail',
-                '-f',
-                '/dev/null'
+                'liquidsoap',
+                self::LIQUIDSOAP_CONTAINER_CONFIG_PATH
+                // 'tail',
+                // '-f',
+                // '/dev/null'
             ]
         );
-        // eval $(opam env) && liquidsoap /etc/liquidsoap/script.liq
 
         if ($result->failed()) {
             throw new Exception('Failed to spin up station: ' . $result->errorOutput());

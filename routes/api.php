@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JingleController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\StationController;
+use App\Http\Controllers\TelegramAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth.session')->get('/user', function (Request $request) {
     return $request->user();
 });
 
@@ -53,5 +55,15 @@ Route::prefix('v1')->group(function () {
 
             Route::get('/now-playing-playlist', [StationController::class, 'getNowPlayingPlaylist']);
         });
+    });
+
+    Route::prefix('auth')->group(function () {
+        Route::prefix('login')->group(function () {
+            Route::post('/telegram', [TelegramAuthController::class, 'login']);
+        });
+    });
+
+    Route::get('/test', function () {
+        return response()->json(['message' => 'Test route is working!']);
     });
 });
