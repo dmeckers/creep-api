@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services\Managers;
 
+use App\Enums\AppEnvEnum;
 use App\Http\DataTransferObjects\Auth\Telegram\TelegramLoginRequestData;
 use App\Models\User;
 use Arr;
 use Auth;
 use Carbon\Carbon;
 use Exception;
+use Hash;
 use Illuminate\Database\Eloquent\Model;
 
 class AuthManager
@@ -30,6 +32,10 @@ class AuthManager
 
     public function telegramAuth(): Model|User
     {
+        if (config('app.env') === AppEnvEnum::LOCAL->value) {
+            return $this->userModel->firstOrFail();
+        }
+
         abort_if($this->isSignatureValid() === false, 403, 'GTFO');
 
         \Log::info('Telegram auth', [
@@ -51,10 +57,15 @@ class AuthManager
                 User::PHOTO_URL => strval($userFromTelegram['photo_url']),
                 User::LAST_NAME => strval($userFromTelegram['last_name']),
                 User::NAME => strval($userFromTelegram['first_name']),
+                User::PASSWORD => Hash::make(strval($userFromTelegram['id'])),
             ]
         );
 
+        $user->save();
+
         Auth::login($user);
+
+        request()->session()->regenerate();
 
         return $user;
     }
