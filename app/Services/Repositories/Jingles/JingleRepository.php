@@ -7,6 +7,7 @@ namespace App\Services\Repositories\Jingles;
 use App\Http\DataTransferObjects\Jingles\UploadJingleRequestData;
 use App\Models\Jingle;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Filesystem\FilesystemManager;
 
 class JingleRepository
@@ -19,11 +20,17 @@ class JingleRepository
     ) {
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function getByCode(string $code): Jingle
     {
         return $this->jingleModel->where(Jingle::CODE, '=', $code)->firstOrFail();
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function deleteByCode(string $code): void
     {
         $jingle = $this->getByCode($code);
@@ -55,6 +62,9 @@ class JingleRepository
         return $this->storage->readStream(self::STORAGE_PATH . $jingle->getStationId() . '/' . $jingle->getCode());
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function getRandomJingle(int $stationId): Jingle
     {
         return $this->jingleModel

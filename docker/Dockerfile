@@ -1,5 +1,5 @@
 # Use the Franken PHP base image
-FROM dunglas/frankenphp
+FROM php:8.2-fpm
 
 WORKDIR /var/www/html
 
@@ -17,7 +17,13 @@ RUN apt-get update && \
         libfreetype6-dev \
         openssh-client \
         docker.io \
-        openssh-server && \
+        openssh-server \
+        gcc \
+        g++ \
+        make \
+        autoconf \
+        libc-dev \
+        pkg-config && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install \
         pdo_pgsql \
@@ -27,8 +33,11 @@ RUN apt-get update && \
         xml \
         pcntl && \
     apt-get clean && \
-
     rm -rf /var/lib/apt/lists/*
+
+RUN yes '' |  pecl install redis
+
+RUN docker-php-ext-enable redis
 
 # Copy custom php.ini
 COPY ./php.ini /usr/local/etc/php/php.ini
@@ -46,4 +55,4 @@ RUN php artisan key:generate && \
     php artisan horizon:install && \
     php artisan vendor:publish --tag=pulse-config
 
-ENTRYPOINT [ "php" , "artisan" , "octane:frankenphp" ]
+ENTRYPOINT [ "php" , "artisan" , "serve" , "--host=0.0.0.0"]

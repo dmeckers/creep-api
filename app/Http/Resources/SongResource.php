@@ -22,6 +22,8 @@ class SongResource extends JsonResource
             'name' => $this->resource->getName(),
             'artist' => $this->resource->getArtist(),
             'fileUrl' => $this->resource->getCode(),
+            'code' => $this->resource->getCode(),
+            'duration' => $this->resource->getDuration(),
         ];
     }
 }

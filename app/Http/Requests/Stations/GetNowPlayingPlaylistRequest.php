@@ -7,7 +7,7 @@ namespace App\Http\Requests\Stations;
 use App\Http\DataTransferObjects\Stations\GetNowPlayingPlaylistRequestData;
 use App\Http\Resources\PlaylistResource;
 use App\Models\Playlist;
-use App\Models\Station;
+use App\Models\Station\Station;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 

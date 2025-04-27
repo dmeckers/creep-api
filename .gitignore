@@ -17,3 +17,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+*.mp3
+*.wav
+*.ogg
+*.m4a

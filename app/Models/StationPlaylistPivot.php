@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class StationPlaylistPivot extends Pivot
 {
+    public const TABLE_NAME = 'station_playlist';
+
+    public const STATION_ID  = 'station_id';
+    public const PLAYLIST_ID = 'playlist_id';
+    public const IS_PLAYING  = 'is_playing';
+
     protected $table = 'station_playlist';
 
     protected $fillable = [

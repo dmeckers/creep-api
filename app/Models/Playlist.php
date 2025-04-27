@@ -4,21 +4,37 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Station\Station;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class Playlist extends Model
 {
     use HasFactory;
+
+    public const TABLE_NAME = 'playlists';
+
+
 
     protected $fillable = [
         'name',
         'description',
         'owner_id',
     ];
+
+    private ?LengthAwarePaginator $songsPaginated = null;
+
+    public const ID          = 'id';
+    public const NAME        = 'name';
+    public const OWNER_ID    = 'owner_id';
+    public const DESCRIPTION = 'description';
+
+    public const STATIONS_RELATION = 'stations';
+    public const SONGS_RELATION    = 'songs';
 
     public function owner(): BelongsTo
     {
@@ -27,12 +43,17 @@ class Playlist extends Model
 
     public function songs(): BelongsToMany
     {
-        return $this->belongsToMany(Song::class);
+        return $this->belongsToMany(
+            related: Song::class,
+            table: PlaylistSongPivot::class,
+            foreignPivotKey: 'playlist_id',
+            relatedPivotKey: 'song_id'
+        );
     }
 
     public function stations(): BelongsToMany
     {
-        return $this->belongsToMany(Station::class);
+        return $this->belongsToMany(Station::class, StationPlaylistPivot::class);
     }
 
     public function image(): MorphOne
@@ -53,5 +74,17 @@ class Playlist extends Model
     public function getName(): string
     {
         return $this->getAttribute('name');
+    }
+
+    public function setSongsPaginated(LengthAwarePaginator $songs): static
+    {
+        $this->songsPaginated = $songs;
+
+        return $this;
+    }
+
+    public function getSongsPaginated(): ?LengthAwarePaginator
+    {
+        return $this->songsPaginated;
     }
 }

@@ -16,6 +16,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
+    public const ID                = 'id';
     public const TELEGRAM_ID       = 'telegram_id';
     public const TELEGRAM_USERNAME = 'telegram_username';
     public const PHOTO_URL         = 'photo_url';
@@ -98,9 +99,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Image::class, 'owner_id');
     }
-    /**
-     * @inheritDoc
-     */
+
+    public function getId(): int
+    {
+        return (int) $this->getAttribute(self::ID);
+    }
+
+    public function getName(): string
+    {
+        return (string) $this->getAttribute(self::NAME);
+    }
+    
     public function getAuthPasswordName()
     {
         return 'password';

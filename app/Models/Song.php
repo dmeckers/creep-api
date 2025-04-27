@@ -22,7 +22,18 @@ class Song extends Model
         'description',
         'owner_id',
         'file_url',
+        'duration',
     ];
+
+    protected $casts = [
+        'duration' => 'float',
+    ];
+
+    public const TABLE_NAME = 'songs';
+
+    public const ID = 'id';
+
+    public const PLAYLISTS_RELATION = 'playlists';
 
     public function owner(): BelongsTo
     {
@@ -36,7 +47,12 @@ class Song extends Model
 
     public function playlists(): BelongsToMany
     {
-        return $this->belongsToMany(Playlist::class);
+        return $this->belongsToMany(
+            related: Playlist::class,
+            table: PlaylistSongPivot::class,
+            foreignPivotKey: 'song_id',
+            relatedPivotKey: 'playlist_id'
+        );
     }
 
     public function genres(): MorphMany
@@ -77,5 +93,10 @@ class Song extends Model
     public function getCode(): string
     {
         return $this->getAttribute('code');
+    }
+
+    public function getDuration(): float
+    {
+        return $this->getAttribute('duration');
     }
 }

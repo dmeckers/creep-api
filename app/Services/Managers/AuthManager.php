@@ -33,18 +33,14 @@ class AuthManager
     public function telegramAuth(): Model|User
     {
         if (config('app.env') === AppEnvEnum::LOCAL->value) {
-            return $this->userModel->firstOrFail();
+            $user = $this->userModel->firstOrFail();
+
+            Auth::login($user);
+
+            return $user;
         }
 
         abort_if($this->isSignatureValid() === false, 403, 'GTFO');
-
-        \Log::info('Telegram auth', [
-            'query' => request()->query(),
-        ]);
-
-        \Log::info('Telegram auth user', [
-            'user' => request()->query(self::USER_QUERY_PARAMETER_KEY),
-        ]);
 
         $userFromTelegram = json_decode(request()->query(self::USER_QUERY_PARAMETER_KEY), true);
 

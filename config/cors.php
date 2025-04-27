@@ -21,10 +21,7 @@ return [
 
     'allowed_origins' => ['*'],
 
-    'allowed_origins_patterns' => [
-        '^https:\/\/[a-z0-9\-]+\.ngrok\-free\.app$',
-        '^https:\/\/[a-z0-9\-]+\.a\.free\.pinggy\.link$',
-    ],
+    'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
@@ -33,5 +30,4 @@ return [
     'max_age' => 0,
 
     'supports_credentials' => true, // Enable credentials support
-
 ];

@@ -17,4 +17,11 @@ class TelegramAuthController extends Controller
     {
         return response()->json(['user' => $this->authManager->telegramAuth()]);
     }
+
+    public function setCookies(): JsonResponse
+    {
+        $cookies = request()->cookie('XSRF-TOKEN');
+        
+        return response()->json(['cookies' => $cookies]);
+    }
 }

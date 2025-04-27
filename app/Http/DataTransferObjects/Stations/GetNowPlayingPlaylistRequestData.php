@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\DataTransferObjects\Stations;
 
+use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Data;
 
 class GetNowPlayingPlaylistRequestData extends Data

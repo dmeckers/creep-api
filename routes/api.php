@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JingleController;
+use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\StationController;
 use App\Http\Controllers\TelegramAuthController;
@@ -18,16 +18,41 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-Route::middleware('auth.session')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('v1/auth')->middleware(['web'])->group(function () {
+    Route::prefix('login')->group(function () {
+        Route::post('/', [TelegramAuthController::class, 'login']);
+    });
 });
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
 
+    Route::get(
+        '/sync',
+        fn() => response()->json(
+            ['server_time' => now()->timestamp]
+        )
+    );
+    /**
+     * User routes
+     */
+    Route::prefix('/user')->group(function () {
+
+        Route::get('/', function (Request $request) {
+            return response()->json(['usr' => $request->user()]);
+        });
+
+        Route::prefix('stations')->group(function () {
+            Route::get('/', [StationController::class, 'getUserStations']);
+        });
+    });
+
+    /**
+     * Songs routes
+     */
     Route::prefix('songs')->group(function () {
-
         Route::post('/', [SongController::class, 'upload']);
+
+        Route::get('/', [SongController::class, 'getSongs']);
 
         Route::prefix('/{code}')->group(function () {
             Route::get('/', [SongController::class, 'getByCode']);
@@ -36,11 +61,57 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+    /**
+     * Playlist routes
+     */
+    Route::prefix('playlists')->group(function () {
+        Route::post('/', [PlaylistController::class, 'createPlaylist']);
+
+        Route::prefix('/{playlist_id}')->where(['playlist_id' => '[0-9]+'])->group(function () {
+            Route::patch('/', [PlaylistController::class, 'updatePlaylist']);
+
+            Route::prefix('songs')->group(function () {
+                Route::get('/', [PlaylistController::class, 'getPlaylistSongs']);
+                Route::patch('/', [PlaylistController::class, 'addSongsToPlaylistById']);
+
+                Route::prefix('/{song_id}')->where(['song_id' => '[0-9]+'])->group(function () {
+                    Route::delete('/', [PlaylistController::class, 'removeSongFromPlaylist']);
+                });
+            });
+        });
+    });
+
+    /**
+     * Stations routes
+     */
     Route::prefix('stations')->group(function () {
+        Route::get('/search', [StationController::class, 'searchStations']);
+        Route::post('/', [StationController::class, 'createStation']);
+
+        Route::prefix('/{station_mount_point}')->where(['station_mount_point' => '[a-zA-Z0-9_-]+'])->group(function () {
+            Route::prefix('queue')->group(function () {
+                Route::get('/current', [StationController::class, 'getCurrentSongFromQueue']);
+            });
+        });
+
         Route::prefix('/{station_id}')->where(['station_id' => '[0-9]+'])->group(function () {
 
-            Route::prefix('jingles')->group(function () {
+            Route::prefix('spin')->group(function () {
+                Route::post('/up', [StationController::class, 'spinUpStation']);
+                Route::post('/down', [StationController::class, 'spinDownStation']);
+            });
 
+            Route::delete('/', [StationController::class, 'deleteStation']);
+            Route::patch('/', [StationController::class, 'updateStation']);
+
+            Route::prefix('playlists')->group(function () {
+                Route::get('/', [PlaylistController::class, 'getStationPlaylists']);
+            });
+
+            /**
+             * Station jingles routes
+             */
+            Route::prefix('jingles')->group(function () {
                 Route::get('/random/stream', [JingleController::class, 'streamRandomJingle']);
                 Route::post('/', [JingleController::class, 'uploadJingle']);
                 Route::get('/', [JingleController::class, 'getAllJingles']);
@@ -50,20 +121,9 @@ Route::prefix('v1')->group(function () {
                     Route::delete('/', [JingleController::class, 'deleteJingleByCode']);
                     Route::get('/stream', [JingleController::class, 'streamedJingle']);
                 });
-
             });
 
             Route::get('/now-playing-playlist', [StationController::class, 'getNowPlayingPlaylist']);
         });
-    });
-
-    Route::prefix('auth')->group(function () {
-        Route::prefix('login')->group(function () {
-            Route::post('/telegram', [TelegramAuthController::class, 'login']);
-        });
-    });
-
-    Route::get('/test', function () {
-        return response()->json(['message' => 'Test route is working!']);
     });
 });
