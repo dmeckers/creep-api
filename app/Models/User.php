@@ -24,6 +24,7 @@ class User extends Authenticatable
     public const NAME              = 'name';
     public const EMAIL             = 'email';
     public const PASSWORD          = 'password';
+    public const BOT_CHAT_ID       = 'bot_chat_id';
 
     /**
      * The attributes that are mass assignable.
@@ -37,6 +38,7 @@ class User extends Authenticatable
         self::TELEGRAM_ID,
         self::TELEGRAM_USERNAME,
         self::PHOTO_URL,
+        self::BOT_CHAT_ID,
         self::LAST_NAME,
     ];
 

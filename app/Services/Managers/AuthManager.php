@@ -5,12 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Managers;
 
 use App\Enums\AppEnvEnum;
-use App\Http\DataTransferObjects\Auth\Telegram\TelegramLoginRequestData;
 use App\Models\User;
-use Arr;
 use Auth;
-use Carbon\Carbon;
-use Exception;
 use Hash;
 use Illuminate\Database\Eloquent\Model;
 
@@ -54,6 +50,7 @@ class AuthManager
                 User::LAST_NAME => strval($userFromTelegram['last_name']),
                 User::NAME => strval($userFromTelegram['first_name']),
                 User::PASSWORD => Hash::make(strval($userFromTelegram['id'])),
+                User::BOT_CHAT_ID => Hash::make(strval($userFromTelegram['bot_chat_id'])),
             ]
         );
 
