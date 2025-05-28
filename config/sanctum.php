@@ -15,11 +15,8 @@ return [
     |
     */
 
-    'stateful' => [
-        "localhost:3000",
-        "localhost:8080",
-        "localhost:5173",
-    ],
+    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'tg-bot:3005,api:8000,nginx:80,localhost:8000')),
+
 
     /*
     |--------------------------------------------------------------------------
