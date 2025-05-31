@@ -1,0 +1,73 @@
+# Use the Franken PHP base image
+FROM php:8.2-fpm
+
+WORKDIR /var/www
+
+# Update package list and install extensions
+RUN apt-get update && \
+    apt-get install -y \
+        curl \
+        wget \
+        libpq-dev \
+        libicu-dev \
+        libzip-dev \
+        libxml2-dev \
+        libpng-dev \
+        libjpeg-dev \
+        ffmpeg \
+        libfreetype6-dev \
+        openssh-client \
+        docker.io \
+        openssh-server \
+        gcc \
+        g++ \
+        make \
+        autoconf \
+        python3 \
+        python3-pip \
+        python3-venv \
+        libc-dev \
+        pkg-config && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install \
+        pdo_pgsql \
+        intl \
+        zip \
+        gd \
+        xml \
+        pcntl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create a virtual environment for yt-dlp
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install yt-dlp in the virtual environment
+RUN /opt/venv/bin/pip install yt-dlp
+
+# Create symlink to make yt-dlp available system-wide
+RUN ln -s /opt/venv/bin/yt-dlp /usr/local/bin/yt-dlp
+RUN ln -s /usr/local/bin/yt-dlp /usr/local/bin/youtube-dl
+
+RUN yes '' |  pecl install redis
+
+RUN docker-php-ext-enable redis
+
+# Copy custom php.ini
+COPY ./php.ini /usr/local/etc/php/php.ini
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+COPY . .
+
+RUN composer install && composer dump-autoload
+
+RUN php artisan key:generate && \
+    php artisan optimize:clear && \
+    php artisan telescope:install && \
+    php artisan telescope:publish && \
+    php artisan horizon:install && \
+    php artisan vendor:publish --tag=pulse-config
+
+CMD ["php-fpm"]
