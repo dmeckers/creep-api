@@ -42,6 +42,7 @@ class DownloadFromYoutubeSongJob implements ShouldQueue
             $songMetaData = $getID3->analyze($splFileInfo->getRealPath());
 
             $duration = $songMetaData['playtime_seconds'];
+
             \Log::info('Song metadata', [
                 'duration' => $duration,
                 'file' => $splFileInfo->getRealPath(),
@@ -64,6 +65,8 @@ class DownloadFromYoutubeSongJob implements ShouldQueue
                     'duration' => $duration,
                 ]
             );
+
+            $storage->disk('local')->deleteDirectory('songs');
 
             broadcast(
                 new UrlSongDowloadSucceededEvent(

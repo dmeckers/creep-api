@@ -25,7 +25,7 @@ class TrackStartedEvent implements ShouldBroadcast
             'track' => [
                 'id' => $song->getId(),
                 'code' => $song->getCode(),
-                'start_at' => $this->trackBroadcast->getBroadcastedAt()?->toISOString(),
+                'start_at' => now()->toISOString(),
                 'duration' => $song->getDuration(),
                 'now' => now()->toISOString(),
             ]
