@@ -50,7 +50,7 @@ class AuthManager
                 User::LAST_NAME => strval($userFromTelegram['last_name']),
                 User::NAME => strval($userFromTelegram['first_name']),
                 User::PASSWORD => Hash::make(strval($userFromTelegram['id'])),
-                User::BOT_CHAT_ID => Hash::make(strval($userFromTelegram['bot_chat_id'])),
+                // User::BOT_CHAT_ID => Hash::make(strval($userFromTelegram['bot_chat_id'])),
             ]
         );
 

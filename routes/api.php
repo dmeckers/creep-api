@@ -4,6 +4,7 @@ use App\Http\Controllers\JingleController;
 use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\StationController;
+use App\Http\Controllers\SyncController;
 use App\Http\Controllers\TelegramAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,12 +27,8 @@ Route::prefix('v1/auth')->middleware(['web'])->group(function () {
 
 Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
 
-    Route::get(
-        '/sync',
-        fn() => response()->json(
-            ['server_time' => now()->timestamp]
-        )
-    );
+    Route::get('/sync',SyncController::class);
+
     /**
      * User routes
      */
