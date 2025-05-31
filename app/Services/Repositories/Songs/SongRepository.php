@@ -18,7 +18,8 @@ class SongRepository
 {
     public function __construct(
         private readonly FilesystemManager $storage,
-        private readonly Song $songModel
+        private readonly Song $songModel,
+        private readonly getID3 $getID3
     ) {
     }
 
@@ -26,9 +27,7 @@ class SongRepository
     {
         $this->checkIfCanUploadSong($data);
 
-        $getId3 = new getID3;
-
-        $songMetaData = $getId3->analyze($data->file->getRealPath());
+        $songMetaData = $this->getID3->analyze($data->file->getRealPath());
 
         $duration = $songMetaData['playtime_seconds'];
 
@@ -36,10 +35,10 @@ class SongRepository
 
         $song = $this->insertSongInDatabase(
             [
-                'code' => $data->code,
+                'code' => $data->code ?? $data->file->hashName(),
                 'owner_id' => $data->ownerId ?? auth()->id(),
                 'artist_id' => $data->artistId,
-                'name' => $data->name,
+                'name' => $data->name ?? $data->file->getClientOriginalName(),
                 'file_url' => $this->storage->url($data->code),
                 'duration' => $duration,
             ]
@@ -74,8 +73,10 @@ class SongRepository
     private function checkIfCanUploadSong(StoreSongRequestData $data): void
     {
         if (
-            $this->storage->get($data->code) !== null
+            false
             || $this->songModel->where('code', '=', $data->code)->exists()
+            || $this->storage->fileExists($data->code)
+            || $this->storage->directoryExists($data->code)
         ) {
             throw new Exception('File already exists');
         }

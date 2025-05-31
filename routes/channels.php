@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('station.{stationName}', function ($user = null, $stationId) {
     return true; // Можно ограничить для авторизованных
 });
+
+Broadcast::channel('user.{userId}.upload-progress', function ($user = null, $stationId) {
+    return true; // Можно ограничить для авторизованных
+});

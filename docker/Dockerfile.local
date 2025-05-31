@@ -1,7 +1,7 @@
 # Use the Franken PHP base image
 FROM php:8.2-fpm
 
-WORKDIR /var/www/html
+WORKDIR /var/www
 
 # Update package list and install extensions
 RUN apt-get update && \
@@ -14,6 +14,7 @@ RUN apt-get update && \
         libxml2-dev \
         libpng-dev \
         libjpeg-dev \
+        ffmpeg \
         libfreetype6-dev \
         openssh-client \
         docker.io \
@@ -22,6 +23,9 @@ RUN apt-get update && \
         g++ \
         make \
         autoconf \
+        python3 \
+        python3-pip \
+        python3-venv \
         libc-dev \
         pkg-config && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
@@ -34,6 +38,17 @@ RUN apt-get update && \
         pcntl && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Create a virtual environment for yt-dlp
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install yt-dlp in the virtual environment
+RUN /opt/venv/bin/pip install yt-dlp
+
+# Create symlink to make yt-dlp available system-wide
+RUN ln -s /opt/venv/bin/yt-dlp /usr/local/bin/yt-dlp
+RUN ln -s /usr/local/bin/yt-dlp /usr/local/bin/youtube-dl
 
 RUN yes '' |  pecl install redis
 
@@ -55,4 +70,4 @@ RUN php artisan key:generate && \
     php artisan horizon:install && \
     php artisan vendor:publish --tag=pulse-config
 
-ENTRYPOINT [ "php" , "artisan" , "serve" , "--host=0.0.0.0"]
+CMD ["php-fpm"]

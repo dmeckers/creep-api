@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Songs\DeleteSongByCodeRequest;
 use App\Http\Requests\Songs\GetSongByCodeRequest;
 use App\Http\Requests\Songs\GetSongsRequest;
+use App\Http\Requests\Songs\UploadSongFromYoutubeRequest;
 use App\Http\Requests\Songs\UploadSongRequest;
 use App\Http\Resources\SongResource;
 use App\Http\Resources\SongResourceCollection;
@@ -56,9 +57,14 @@ class SongController extends Controller
     public function streamedSong(GetSongByCodeRequest $request): StreamedResponse
     {
         $stream = $this->songRepository->getStreamedSong($request->code);
-        $path = stream_get_meta_data($stream)['uri'];
-        $filesize = filesize($path);
+        $contents = stream_get_contents($stream);
+        fclose($stream);
 
+        // Create a temporary file that we can access directly
+        $tempFile = tempnam(sys_get_temp_dir(), 'song_');
+        file_put_contents($tempFile, $contents);
+
+        $filesize = filesize($tempFile);
         $start = 0;
         $end = $filesize - 1;
         $status = 200;
@@ -88,9 +94,9 @@ class SongController extends Controller
             $headers['Content-Length'] = $filesize;
         }
 
-        return response()->stream(function () use ($path, $start, $end) {
+        return response()->stream(function () use ($tempFile, $start, $end) {
             $chunkSize = 1024 * 8;
-            $handle = fopen($path, 'rb');
+            $handle = fopen($tempFile, 'rb');
             fseek($handle, $start);
             $bytesToOutput = $end - $start + 1;
 
@@ -102,6 +108,8 @@ class SongController extends Controller
             }
 
             fclose($handle);
+            // Clean up the temporary file
+            @unlink($tempFile);
         }, $status, $headers);
     }
 

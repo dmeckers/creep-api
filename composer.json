@@ -19,6 +19,7 @@
         "laravel/tinker": "^2.8",
         "league/flysystem-aws-s3-v3": "^3.0",
         "meilisearch/meilisearch-php": "^1.14",
+        "norkunas/youtube-dl-php": "dev-master",
         "predis/predis": "^2.0",
         "pusher/pusher-php-server": "^7.2",
         "spatie/laravel-data": "^4.15",

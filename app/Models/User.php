@@ -16,6 +16,9 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
+
+    public const TABLE_NAME        = 'users';
+    
     public const ID                = 'id';
     public const TELEGRAM_ID       = 'telegram_id';
     public const TELEGRAM_USERNAME = 'telegram_username';

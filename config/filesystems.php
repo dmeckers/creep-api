@@ -13,8 +13,8 @@ return [
     |
     */
 
-    // 'default' => env('FILESYSTEM_DISK', 'local'),
-    'default' => 'local',
+    'default' => env('FILESYSTEM_DISK', 'local'),
+    // 'default' => 'local',
 
     /*
     |--------------------------------------------------------------------------

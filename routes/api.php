@@ -6,8 +6,11 @@ use App\Http\Controllers\SongController;
 use App\Http\Controllers\StationController;
 use App\Http\Controllers\SyncController;
 use App\Http\Controllers\TelegramAuthController;
+use App\Http\Controllers\UrlSongUploadControlller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use YoutubeDl\Options;
+use YoutubeDl\YoutubeDl;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +22,28 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::get('/test', function () {
+    $yt = new YoutubeDl();
+    $collection = $yt->download(
+        Options::create()
+            ->downloadPath('/var/www/storage/app/public/songs')
+            ->extractAudio(true)
+            ->audioFormat('mp3')
+            ->audioQuality('0') // best
+            ->output('%(title)s.%(ext)s')
+            ->url('https://youtu.be/hgoCxqQFAxs?si=iZS27_mnMMs5J-PD')
+    );
+
+    foreach ($collection->getVideos() as $video) {
+        if ($video->getError() !== null) {
+            echo "Error downloading video: {$video->getError()}.";
+        } else {
+            $video->getFile(); // audio file
+        }
+    }
+});
+
+
 Route::prefix('v1/auth')->middleware(['web'])->group(function () {
     Route::prefix('login')->group(function () {
         Route::post('/', [TelegramAuthController::class, 'login']);
@@ -27,7 +52,7 @@ Route::prefix('v1/auth')->middleware(['web'])->group(function () {
 
 Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
 
-    Route::get('/sync',SyncController::class);
+    Route::get('/sync', SyncController::class);
 
     /**
      * User routes
@@ -47,9 +72,13 @@ Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
      * Songs routes
      */
     Route::prefix('songs')->group(function () {
-        Route::post('/', [SongController::class, 'upload']);
 
+        Route::post('/', [SongController::class, 'upload']);
         Route::get('/', [SongController::class, 'getSongs']);
+
+        Route::post('/youtube/upload', [UrlSongUploadControlller::class, 'uploadFromYoutube']);
+        Route::post('/youtu.be/upload', [UrlSongUploadControlller::class, 'uploadFromYoutube']);
+        Route::post('/vkontakte/upload', [UrlSongUploadControlller::class, 'uploadFromVkontakte']);
 
         Route::prefix('/{code}')->group(function () {
             Route::get('/', [SongController::class, 'getByCode']);
