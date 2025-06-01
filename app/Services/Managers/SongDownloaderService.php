@@ -26,16 +26,18 @@ class SongDownloaderService
         );
 
         // Set up progress callback before initiating download
-        $youtubeDl->onProgress(static function (?string $progressTarget, string $percentage, string $size, string $speed, string $eta, ?string $totalTime): void {
-            \Log::info("Download progress", [
-                'file' => $progressTarget,
-                'percentage' => $percentage,
-                'size' => $size,
-                'speed' => $speed ?: 'N/A',
-                'eta' => $eta ?: 'N/A',
-                'total_time' => $totalTime
-            ]);
-        });
+        $youtubeDl->onProgress(
+            static function (?string $progressTarget, string $percentage, string $size, ?string $speed, string $eta, ?string $totalTime): void {
+                \Log::info("Download progress", [
+                    'file' => $progressTarget,
+                    'percentage' => $percentage,
+                    'size' => $size,
+                    'speed' => $speed ?: 'N/A',
+                    'eta' => $eta ?: 'N/A',
+                    'total_time' => $totalTime
+                ]);
+            }
+        );
 
         // The download is synchronous - it will only return after completion
         $collection = $youtubeDl->download(
@@ -44,6 +46,7 @@ class SongDownloaderService
                 ->extractAudio(true)
                 ->audioFormat('mp3')
                 ->audioQuality('0')
+                ->cookies(config('youtube-dl.cookies', '/var/www/cookies.txt'))
                 ->output('%(title)s.%(ext)s')
                 ->url($url)
         );
@@ -62,7 +65,7 @@ class SongDownloaderService
         $error = collect($collection->getVideos())
             ->filter(fn(Video $vid) => $vid->getError() !== null)
             ->first()
-            ?->getError();
+                ?->getError();
 
         throw new Exception(
             'Failed to download song from YouTube: ' . ($error ?? 'Unknown error')
