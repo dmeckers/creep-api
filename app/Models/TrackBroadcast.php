@@ -28,6 +28,8 @@ class TrackBroadcast extends \Illuminate\Database\Eloquent\Model
         'station_queue_id',
     ];
 
+    public const SONG_RELATION          = 'song';
+    
     protected $casts = [
         self::START_AT       => 'datetime',
         self::BROADCASTED_AT => 'datetime',

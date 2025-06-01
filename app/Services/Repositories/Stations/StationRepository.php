@@ -8,6 +8,7 @@ use App\Http\DataTransferObjects\Stations\CreateStationReqestData;
 use App\Http\DataTransferObjects\Stations\DeleteStationRequestData;
 use App\Http\DataTransferObjects\Stations\GetCurrentSongFromQueueRequestData;
 use App\Http\DataTransferObjects\Stations\GetNowPlayingPlaylistRequestData;
+use App\Http\DataTransferObjects\Stations\GetStationByMountPointRequestData;
 use App\Http\DataTransferObjects\Stations\UpdateStationRequestData;
 use App\Http\DataTransferObjects\Stations\SearchStationsRequestData;
 use App\Http\Requests\Stations\DeleteStationRequest;
@@ -77,6 +78,9 @@ class StationRepository
 
         return $stationQueue->trackBroadcasts()
             ->where(TrackBroadcast::START_AT, '<=', now())
+            ->with([
+                TrackBroadcast::SONG_RELATION
+            ])
             ->orderByDesc(TrackBroadcast::ORDER)
             ->firstOrFail();
     }
@@ -152,5 +156,19 @@ class StationRepository
         }
 
         $station->delete();
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    function getStationByMountPoint(GetStationByMountPointRequestData $data): Station
+    {
+        return $this->stationModel
+            ->where(
+                Station::MOUNT_POINT,
+                '=',
+                $data->stationMountPoint
+            )
+            ->firstOrFail();
     }
 }

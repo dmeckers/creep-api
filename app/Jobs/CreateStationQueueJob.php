@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\StationStartedEvent;
 use App\Models\Song;
 use App\Models\Station\Station;
 use App\Models\StationQueue;
@@ -57,6 +58,10 @@ class CreateStationQueueJob implements ShouldQueue
         if ($delay < 0) {
             $delay = 0;
         }
+
+        $this->station->update([Station::IS_LIVE => true]);
+        
+        event(new StationStartedEvent($this->station));
 
         BroadcastNextSongJob::dispatch($first)->delay($delay);
     }

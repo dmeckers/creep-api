@@ -32,6 +32,11 @@ class Song extends Model
     public const TABLE_NAME = 'songs';
 
     public const ID = 'id';
+    public const NAME = 'name';
+    public const CODE = 'code';
+    public const ARTIST_ID = 'artist_id';
+    public const DESCRIPTION = 'description';
+    public const OWNER_ID = 'owner_id';
 
     public const PLAYLISTS_RELATION = 'playlists';
 

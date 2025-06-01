@@ -8,6 +8,7 @@ use App\Http\Requests\Stations\CreateStationReqest;
 use App\Http\Requests\Stations\DeleteStationRequest;
 use App\Http\Requests\Stations\GetCurrentSongFromQueueRequest;
 use App\Http\Requests\Stations\GetNowPlayingPlaylistRequest;
+use App\Http\Requests\Stations\GetStationByMountPointRequest;
 use App\Http\Requests\Stations\SearchStationsRequest;
 use App\Http\Requests\Stations\SpinDownStationRequest;
 use App\Http\Requests\Stations\SpinUpStationRequest;
@@ -107,5 +108,12 @@ class StationController extends Controller
         $this->stationRepository->deleteStation($request->data());
 
         return $request->responseResource();
+    }
+
+    public function getStationByMountPoint(GetStationByMountPointRequest $request): StationResource
+    {
+        return $request->responseResource(
+            $this->stationRepository->getStationByMountPoint($request->data())
+        );
     }
 }

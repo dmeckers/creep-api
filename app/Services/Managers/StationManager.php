@@ -27,11 +27,7 @@ class StationManager
             : $station->playlists()->first()
         );
 
-        $station->setIsLive(true);
-        $station->save();
-
         dispatch(new CreateStationQueueJob($station));
-        event(new StationStartedEvent($station));
     }
 
     public function spinDownStation(Station $station)

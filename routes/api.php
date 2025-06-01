@@ -114,11 +114,14 @@ Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
         Route::get('/search', [StationController::class, 'searchStations']);
         Route::post('/', [StationController::class, 'createStation']);
 
-        Route::prefix('/{station_mount_point}')->where(['station_mount_point' => '[a-zA-Z0-9_-]+'])->group(function () {
-            Route::prefix('queue')->group(function () {
-                Route::get('/current', [StationController::class, 'getCurrentSongFromQueue']);
+        Route::prefix('/{station_mount_point}')->where(['station_mount_point' => '[a-zA-Z0-9_-]+'])
+            ->group(function () {
+                Route::prefix('queue')->group(function () {
+                    Route::get('/current', [StationController::class, 'getCurrentSongFromQueue']);
+                });
+
+                Route::get('/', [StationController::class, 'getStationByMountPoint']);
             });
-        });
 
         Route::prefix('/{station_id}')->where(['station_id' => '[0-9]+'])->group(function () {
 

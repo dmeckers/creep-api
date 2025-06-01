@@ -110,7 +110,13 @@ class SongRepository
                     operator: 'like',
                     value: '%' . $name . '%'
                 )
-            )->paginate(
+            )
+            ->where(
+                column: Song::OWNER_ID,
+                operator: '=',
+                value: $data->owner_id ?? auth()->id()
+            )
+            ->paginate(
                 perPage: $data->per_page,
                 page: $data->page,
             );
