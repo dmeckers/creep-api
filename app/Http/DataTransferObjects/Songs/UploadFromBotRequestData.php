@@ -17,6 +17,7 @@ class UploadFromBotRequestData extends Data
         public int $telegram_user_id,
         public string $telegram_user_first_name,
         public ?string $telegram_user_username,
+        public string $filename,
     ) {
     }
 

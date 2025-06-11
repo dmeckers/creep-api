@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Songs\DeleteSongByCodeRequest;
+use App\Exceptions\SongAlreadyAddedException;
+use App\Http\Requests\Songs\DeleteSongRequest;
 use App\Http\Requests\Songs\GetSongByCodeRequest;
+use App\Http\Requests\Songs\GetSongRequest;
 use App\Http\Requests\Songs\GetSongsRequest;
 use App\Http\Requests\Songs\UploadFromBotRequest;
 use App\Http\Requests\Songs\UploadSongFromYoutubeRequest;
@@ -41,16 +43,16 @@ class SongController extends Controller
         }
     }
 
-    public function getByCode(GetSongByCodeRequest $requset): SongResource
+    public function findOrFail(GetSongRequest $request): SongResource
     {
-        return $requset->resourceResponse(
-            $this->songRepository->getByCode($requset->code)
+        return $request->resourceResponse(
+            $this->songRepository->findOrFail($request->data()->id)
         );
     }
 
-    public function deleteByCode(DeleteSongByCodeRequest $requset): JsonResponse
+    public function delete(DeleteSongRequest $request): JsonResponse
     {
-        $this->songRepository->deleteByCode($requset->code);
+        $this->songRepository->delete($request->data()->id);
 
         return response()->json([], 204);
     }
@@ -124,10 +126,16 @@ class SongController extends Controller
 
     public function uploadFromBot(UploadFromBotRequest $request)
     {
-        $request->response(
-            $this->songRepository->uploadFromBot(
-                $request->data()
-            )
-        );
+        try {
+            $request->response(
+                $this->songRepository->uploadFromBot(
+                    $request->data()
+                )
+            );
+        } catch (SongAlreadyAddedException $th) {
+            return response()->json([
+                'message' => 'Song with this code already exists or file already exists in storage.'
+            ], 400);
+        }
     }
 }

@@ -15,10 +15,7 @@ class StoreSongRequestData extends Data
 
         public UploadedFile $file,
 
-        #[Unique('songs', 'code')]
-        public string $code,
-
-        public ?string $name = 'Unknown Track',
+        public string $name = 'Unknown Track',
 
         #[Exists('artists', 'id')]
         public ?int $artistId = null,

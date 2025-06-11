@@ -7,11 +7,11 @@ namespace App\Http\DataTransferObjects\Songs;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Data;
 
-class DeleteSongByCodeRequestData extends Data
+class GetSongRequestData extends Data
 {
     public function __construct(
-        #[Exists('songs', 'code')]
-        public string $code,
+        #[Exists('songs', 'id')]
+        public int $id,
     ) {
     }
 }

@@ -25,6 +25,7 @@ class UploadFromBotRequest extends FormRequest
                 'telegram_user_id' => $this->integer('telegram_user_id'),
                 'telegram_user_first_name' => $this->input('telegram_user_first_name'),
                 'telegram_user_username' => $this->input('telegram_user_username', null),
+                'filename' => $this->input('filename', null),
             ]
         );
     }

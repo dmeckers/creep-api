@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\RouteValidationEnum;
 use App\Http\Controllers\JingleController;
 use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\SongController;
@@ -43,7 +44,7 @@ Route::get('/test', function () {
     }
 });
 
-Route::post('/upload-from-bot' , [SongController::class, 'uploadFromBot']);
+Route::post('/upload-from-bot', [SongController::class, 'uploadFromBot']);
 
 
 Route::prefix('v1/auth')->middleware(['web'])->group(function () {
@@ -82,9 +83,12 @@ Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
         Route::post('/youtu.be/upload', [UrlSongUploadControlller::class, 'uploadFromYoutube']);
         Route::post('/vkontakte/upload', [UrlSongUploadControlller::class, 'uploadFromVkontakte']);
 
-        Route::prefix('/{code}')->group(function () {
-            Route::get('/', [SongController::class, 'getByCode']);
-            Route::delete('/', [SongController::class, 'deleteByCode']);
+        Route::prefix('/{id}')->where(['id' => RouteValidationEnum::ID->value])->group(function () {
+            Route::get('/', [SongController::class, 'findOrFail']);
+            Route::delete('/', [SongController::class, 'delete']);
+        });
+
+        Route::prefix('/{code}')->where(['id' => RouteValidationEnum::HASH->value])->group(function () {
             Route::get('/stream', [SongController::class, 'streamedSong']);
         });
     });
@@ -95,14 +99,14 @@ Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
     Route::prefix('playlists')->group(function () {
         Route::post('/', [PlaylistController::class, 'createPlaylist']);
 
-        Route::prefix('/{playlist_id}')->where(['playlist_id' => '[0-9]+'])->group(function () {
+        Route::prefix('/{playlist_id}')->where(['playlist_id' => RouteValidationEnum::ID->value])->group(function () {
             Route::patch('/', [PlaylistController::class, 'updatePlaylist']);
 
             Route::prefix('songs')->group(function () {
                 Route::get('/', [PlaylistController::class, 'getPlaylistSongs']);
                 Route::patch('/', [PlaylistController::class, 'addSongsToPlaylistById']);
 
-                Route::prefix('/{song_id}')->where(['song_id' => '[0-9]+'])->group(function () {
+                Route::prefix('/{song_id}')->where(['song_id' => RouteValidationEnum::ID->value])->group(function () {
                     Route::delete('/', [PlaylistController::class, 'removeSongFromPlaylist']);
                 });
             });
@@ -125,7 +129,7 @@ Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
                 Route::get('/', [StationController::class, 'getStationByMountPoint']);
             });
 
-        Route::prefix('/{station_id}')->where(['station_id' => '[0-9]+'])->group(function () {
+        Route::prefix('/{station_id}')->where(['station_id' => RouteValidationEnum::ID->value])->group(function () {
 
             Route::prefix('spin')->group(function () {
                 Route::post('/up', [StationController::class, 'spinUpStation']);

@@ -31,12 +31,15 @@ class Song extends Model
 
     public const TABLE_NAME = 'songs';
 
-    public const ID = 'id';
-    public const NAME = 'name';
-    public const CODE = 'code';
-    public const ARTIST_ID = 'artist_id';
-    public const DESCRIPTION = 'description';
-    public const OWNER_ID = 'owner_id';
+    public const ID              = 'id';
+    public const NAME            = 'name';
+    public const CODE            = 'code';
+    public const ARTIST_ID       = 'artist_id';
+    public const DESCRIPTION     = 'description';
+    public const OWNER_ID        = 'owner_id';
+    public const FILE_URL        = 'file_url';
+    public const DURATION        = 'duration';
+    public const ARTIST_RELATION = 'artist';
 
     public const PLAYLISTS_RELATION = 'playlists';
 

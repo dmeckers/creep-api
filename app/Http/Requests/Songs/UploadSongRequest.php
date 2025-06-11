@@ -21,7 +21,6 @@ class UploadSongRequest extends FormRequest
     {
         return StoreSongRequestData::from([
             'file' => $this->file('file'),
-            'code' => $this->input('code'),
             'name' => $this->input('name'),
             'artistId' => $this->input('artistId'),
             'ownerId' => $this->input('ownerId'),
