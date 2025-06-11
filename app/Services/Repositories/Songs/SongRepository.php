@@ -6,10 +6,13 @@ namespace App\Services\Repositories\Songs;
 
 use App\Http\DataTransferObjects\Songs\GetSongsRequestData;
 use App\Http\DataTransferObjects\Songs\StoreSongRequestData;
+use App\Http\DataTransferObjects\Songs\UploadFromBotRequestData;
 use App\Models\Playlist;
 use App\Models\Song;
+use App\Services\Repositories\Users\UserRepository;
 use Exception;
 use getID3;
+use GuzzleHttp\Client;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
@@ -19,7 +22,9 @@ class SongRepository
     public function __construct(
         private readonly FilesystemManager $storage,
         private readonly Song $songModel,
-        private readonly getID3 $getID3
+        private readonly getID3 $getID3,
+        private readonly Client $client,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -120,5 +125,55 @@ class SongRepository
                 perPage: $data->per_page,
                 page: $data->page,
             );
+    }
+
+    function uploadFromBot(UploadFromBotRequestData $data): Song
+    {
+        $user = $this->userRepository->firstOrCreate(data: $data->toUserData());
+
+        $this->checkIfCanUploadFromBot($data);
+
+        $filePath = $this->storage->disk('local')->path($data->file_id);
+
+        $this->client->get($data->file_url, [
+            'sink' => $filePath,
+        ]);
+
+        $songMetaData = $this->getID3->analyze($filePath);
+        $duration = $songMetaData['playtime_seconds'];
+
+        $this->storage->disk('s3')->put(
+            $data->file_id,
+            $this->storage->disk('local')->get($data->file_id)
+        );
+
+        $this->storage->disk('local')->delete($data->file_id);
+
+        $song = $this->insertSongInDatabase(
+            [
+                'code' => $data->file_id,
+                'owner_id' => $user->getId(), 
+                'artist_id' => null,
+                'name' => $data->file_id,
+                'file_url' => $this->storage->disk('s3')->url($data->file_id),
+                'duration' => $duration,
+            ]
+        );
+
+        return $song;
+    }
+
+    public function checkIfCanUploadFromBot(UploadFromBotRequestData $data): bool
+    {
+        if (
+            false
+            || $this->songModel->where('code', '=', $data->file_id)->exists()
+            || $this->storage->fileExists($data->file_id)
+            || $this->storage->directoryExists($data->file_id)
+        ) {
+            throw new Exception('File already exists');
+        }
+
+        return true;
     }
 }

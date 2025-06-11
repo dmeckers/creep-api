@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Songs\DeleteSongByCodeRequest;
 use App\Http\Requests\Songs\GetSongByCodeRequest;
 use App\Http\Requests\Songs\GetSongsRequest;
+use App\Http\Requests\Songs\UploadFromBotRequest;
 use App\Http\Requests\Songs\UploadSongFromYoutubeRequest;
 use App\Http\Requests\Songs\UploadSongRequest;
 use App\Http\Resources\SongResource;
@@ -119,5 +120,14 @@ class SongController extends Controller
         $songs = $this->songRepository->getSongs($requst->data());
 
         return SongResourceCollection::make($songs);
+    }
+
+    public function uploadFromBot(UploadFromBotRequest $request)
+    {
+        $request->response(
+            $this->songRepository->uploadFromBot(
+                $request->data()
+            )
+        );
     }
 }

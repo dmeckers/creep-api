@@ -29,7 +29,10 @@ class AuthManager
     public function telegramAuth(): Model|User
     {
         if (config('app.env') === AppEnvEnum::LOCAL->value) {
-            $user = $this->userModel->firstOrFail();
+            /**
+             * @var User $user
+             */
+            $user = $this->userModel->find(9);
 
             Auth::login($user);
 
@@ -45,7 +48,7 @@ class AuthManager
                 User::TELEGRAM_ID => strval($userFromTelegram['id']),
             ],
             [
-                User::TELEGRAM_USERNAME => strval($userFromTelegram['username']),
+                User::TELEGRAM_USERNAME => isset($userFromTelegram['username']) ? strval($userFromTelegram['username']) : null,
                 User::PHOTO_URL => strval($userFromTelegram['photo_url']),
                 User::LAST_NAME => strval($userFromTelegram['last_name']),
                 User::NAME => strval($userFromTelegram['first_name']),
