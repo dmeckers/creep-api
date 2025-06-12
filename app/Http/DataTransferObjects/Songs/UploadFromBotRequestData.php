@@ -11,7 +11,7 @@ use Spatie\LaravelData\Data;
 class UploadFromBotRequestData extends Data
 {
     public function __construct(
-        #[Regex(pattern: '/^https:\/\/api\.telegram\.org\/file\/bot[0-9]+:[A-Za-z0-9_-]+\/music\/file_\d+\.mp3$/')]
+        #[Regex(pattern: '/^https:\/\/api\.telegram\.org\//')]
         public string $file_url,
         public string $file_id,
         public int $telegram_user_id,

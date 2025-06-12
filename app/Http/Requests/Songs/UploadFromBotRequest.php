@@ -18,6 +18,15 @@ class UploadFromBotRequest extends FormRequest
 
     public function data(): UploadFromBotRequestData
     {
+        \Log::info('UploadFromBotRequest data', [
+            'file_url' => $this->input('file_url'),
+            'file_id' => $this->input('file_id'),
+            'telegram_user_id' => $this->input('telegram_user_id'),
+            'telegram_user_first_name' => $this->input('telegram_user_first_name'),
+            'telegram_user_username' => $this->input('telegram_user_username'),
+            'filename' => $this->input('filename'),
+        ]);
+        
         return UploadFromBotRequestData::validateAndCreate(
             [
                 'file_url' => (string) $this->input('file_url'),
@@ -25,7 +34,7 @@ class UploadFromBotRequest extends FormRequest
                 'telegram_user_id' => $this->integer('telegram_user_id'),
                 'telegram_user_first_name' => $this->input('telegram_user_first_name'),
                 'telegram_user_username' => $this->input('telegram_user_username', null),
-                'filename' => $this->input('filename', null),
+                'filename' => $this->input('filename'),
             ]
         );
     }
