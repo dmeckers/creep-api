@@ -59,7 +59,8 @@ class SongController extends Controller
 
     public function streamedSong(GetSongByCodeRequest $request): StreamedResponse
     {
-        $stream = $this->songRepository->getStreamedSong($request->code);
+        $code = $request->data()->code;
+        $stream = $this->songRepository->getStreamedSong($code);
         $contents = stream_get_contents($stream);
         fclose($stream);
 
@@ -73,7 +74,7 @@ class SongController extends Controller
         $status = 200;
         $headers = [
             'Content-Type' => 'audio/mpeg',
-            'Content-Disposition' => 'inline; filename="' . $request->code . '.mp3"',
+            'Content-Disposition' => 'inline; filename="' . $code . '.mp3"',
             'Accept-Ranges' => 'bytes',
         ];
 

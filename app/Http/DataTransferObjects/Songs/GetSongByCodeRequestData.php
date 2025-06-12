@@ -10,8 +10,8 @@ use Spatie\LaravelData\Data;
 class GetSongByCodeRequestData extends Data
 {
     public function __construct(
-        #[Exists('songs', 'id')]
-        public int $id,
+        #[Exists('songs', 'code')]
+        public string $code,
     ) {
     }
 }

@@ -19,14 +19,14 @@ class GetSongByCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|string|exists:songs,id',
+            'code' => 'required|string|exists:songs,code',
         ];
     }
 
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'id' => $this->route('id'),
+            'code' => $this->route('code'),
         ]);
     }
 
