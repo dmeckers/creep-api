@@ -101,9 +101,15 @@ class SongRepository
 
     public function getStreamedSong(string $code)
     {
-        $fileName = $this->storage->files($code)[0];
+        $savedFromLocal = $this->storage->files($code);
 
-        return $this->storage->readStream($fileName);
+        if (!empty($savedFromLocal)) {
+            $fileName = $savedFromLocal[0];
+
+            return $this->storage->readStream($fileName);
+        }
+
+        return $this->storage->readStream($code);
     }
 
     public function getSongs(GetSongsRequestData $data): LengthAwarePaginator
