@@ -88,7 +88,7 @@ Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
             Route::delete('/', [SongController::class, 'delete']);
         });
 
-        Route::prefix('/{code}')->where(['id' => RouteValidationEnum::HASH->value])->group(function () {
+        Route::prefix('/{code}')->where(['code' => RouteValidationEnum::HASH->value])->group(function () {
             Route::get('/stream', [SongController::class, 'streamedSong']);
         });
     });
