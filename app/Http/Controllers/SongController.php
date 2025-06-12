@@ -59,7 +59,7 @@ class SongController extends Controller
 
     public function streamedSong(GetSongByCodeRequest $request): StreamedResponse
     {
-        $code = $request->data()->code;
+        $code = $request->code();
         $stream = $this->songRepository->getStreamedSong($code);
         $contents = stream_get_contents($stream);
         fclose($stream);

@@ -35,6 +35,11 @@ class GetSongByCodeRequest extends FormRequest
         return resolve(GetSongByCodeRequestData::class);
     }
 
+    public function code(): string
+    {
+        return (string) $this->route('code');
+    }
+
     public function resourceResponse(Song $track): SongResource
     {
         return new SongResource($track);
