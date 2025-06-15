@@ -44,7 +44,11 @@ Route::get('/test', function () {
     }
 });
 
-Route::post('/upload-from-bot', [SongController::class, 'uploadFromBot']);
+Route::post('/upload-from-bot', [SongController::class, 'uploadFileFromBot']);
+
+Route::prefix('v1')->group(function () {
+    Route::post('/upload-from-bot', [SongController::class, 'uploadUrlFromBot']);
+});
 
 
 Route::prefix('v1/auth')->middleware(['web'])->group(function () {

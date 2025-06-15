@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace App\Http\DataTransferObjects\Songs;
 
 use App\Http\DataTransferObjects\Users\FirstOrCreateTelegramUserData;
+use Illuminate\Http\UploadedFile;
 use Spatie\LaravelData\Attributes\Validation\Regex;
 use Spatie\LaravelData\Data;
 
-class UploadFromBotRequestData extends Data
+class UploadFileFromBotRequestData extends Data
 {
     public function __construct(
-        public string $file_url,
         public string $file_id,
         public int $telegram_user_id,
         public string $telegram_user_first_name,
         public ?string $telegram_user_username,
         public string $filename,
+        public UploadedFile $file,
     ) {
     }
 

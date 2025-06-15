@@ -7,6 +7,7 @@ namespace App\Services\Repositories\Songs;
 use App\Exceptions\SongAlreadyAddedException;
 use App\Http\DataTransferObjects\Songs\GetSongsRequestData;
 use App\Http\DataTransferObjects\Songs\StoreSongRequestData;
+use App\Http\DataTransferObjects\Songs\UploadFileFromBotRequestData;
 use App\Http\DataTransferObjects\Songs\UploadFromBotRequestData;
 use App\Models\Playlist;
 use App\Models\Song;
@@ -44,7 +45,7 @@ class SongRepository
         );
 
         if (!$this->canUploadSong($code)) {
-            throw new SongAlreadyAddedException('Song with this code already exists or file already exists in storage.');
+            throw new SongAlreadyAddedException();
         }
 
         $this->storage->putFile($code, $data->file);
@@ -145,7 +146,45 @@ class SongRepository
             );
     }
 
-    function uploadFromBot(UploadFromBotRequestData $data): Song
+    public function uploadFileFromBot(UploadFileFromBotRequestData $data): Song
+    {
+        $user = $this->userRepository->firstOrCreate(data: $data->toUserData());
+
+        $file = $data->file;
+        $fileSize = $file->getSize();
+
+        $code = CodeGenerator::generateCode(
+            fileSize: $fileSize,
+            fileName: $data->filename,
+        );
+
+        if (!$this->canUploadSong($code)) {
+            throw new SongAlreadyAddedException();
+        }
+
+        $fileMetaData = $this->getID3->analyze($file->getRealPath());
+        $duration = $fileMetaData['playtime_seconds'];
+        $this->storage->disk('s3')->put(
+            $code,
+            $file->getContent()
+        );
+
+        $song = $this->insertSongInDatabase(
+            [
+                'code' => $code,
+                'owner_id' => $user->getId(),
+                'artist_id' => null,
+                'name' => $data->filename,
+                'file_url' => $this->storage->disk('s3')->url($code),
+                'duration' => $duration,
+            ]
+        );
+
+
+        return $song;
+    }
+
+    public function uploadFromBot(UploadFromBotRequestData $data): Song
     {
         $user = $this->userRepository->firstOrCreate(data: $data->toUserData());
 
@@ -165,7 +204,7 @@ class SongRepository
         if (!$this->canUploadSong($code)) {
             $deleteFromLocalStorage();
 
-            throw new SongAlreadyAddedException('Song with this code already exists or file already exists in storage.');
+            throw new SongAlreadyAddedException();
         }
 
         $songMetaData = $this->getID3->analyze($filePath);

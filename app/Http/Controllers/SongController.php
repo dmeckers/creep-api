@@ -9,6 +9,7 @@ use App\Http\Requests\Songs\DeleteSongRequest;
 use App\Http\Requests\Songs\GetSongByCodeRequest;
 use App\Http\Requests\Songs\GetSongRequest;
 use App\Http\Requests\Songs\GetSongsRequest;
+use App\Http\Requests\Songs\UploadFileFromBotRequest;
 use App\Http\Requests\Songs\UploadFromBotRequest;
 use App\Http\Requests\Songs\UploadSongFromYoutubeRequest;
 use App\Http\Requests\Songs\UploadSongRequest;
@@ -125,7 +126,7 @@ class SongController extends Controller
         return SongResourceCollection::make($songs);
     }
 
-    public function uploadFromBot(UploadFromBotRequest $request)
+    public function uploadUrlFromBot(UploadFromBotRequest $request)
     {
         try {
             $request->response(
@@ -138,5 +139,14 @@ class SongController extends Controller
                 'message' => 'Song with this code already exists or file already exists in storage.'
             ], 400);
         }
+    }
+
+    public function uploadFileFromBot(UploadFileFromBotRequest $request): SongResource
+    {
+        return $request->responseResource(
+            $this->songRepository->uploadFileFromBot(
+                $request->data()
+            )
+        );
     }
 }
