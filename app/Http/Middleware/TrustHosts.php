@@ -15,8 +15,7 @@ class TrustHosts extends Middleware
     {
         return [
             $this->allSubdomainsOfApplicationUrl(),
-            'api:8000',
-            'http://api:8000'
+            '^api(:8000)?$',
         ];
     }
 }
