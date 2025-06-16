@@ -16,8 +16,8 @@ return [
     */
 
     'stateful' => [
-        'api.cream-fm.art.com',
-        'cream-fm.art.com',
+        "api.cream-fm.art",
+        "cream-fm.art",
         "localhost:3000",
         "localhost:8080",
         "localhost:5173",
